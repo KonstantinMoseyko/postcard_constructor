@@ -1,9 +1,12 @@
 import React from 'react'
 import { MDBTable, MDBTableHead, MDBTableBody, MDBIcon, MDBBtn } from 'mdb-react-ui-kit';
 
-const TodoItem = ({ todo, deleteNote}) => {
+const TodoItem = ({ todo, deleteNote }) => {
     return (
         <tr>
+            <td>
+                {todo.id}
+            </td>
             <td>
                 {todo.project}
             </td>
@@ -23,7 +26,7 @@ const TodoItem = ({ todo, deleteNote}) => {
                 {todo.status}
             </td>
             <td>
-                <MDBBtn onClick={() => deleteNote(note.id)} color='link'><MDBIcon fas icon="archive" /></MDBBtn>
+                <button onClick={() => deleteNote(todo.id)} type='button'>Delete</button>
             </td>
         </tr>
     )
@@ -33,6 +36,9 @@ const TodoList = ({ todos, deleteNote }) => {
         <table>
             <thead>
                 <tr>
+                    <th>
+                        ID
+                    </th>
                     <th>
                         PROJECT
                     </th>
@@ -59,4 +65,5 @@ const TodoList = ({ todos, deleteNote }) => {
         </table>
     )
 }
+
 export default TodoList

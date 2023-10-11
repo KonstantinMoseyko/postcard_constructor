@@ -108,48 +108,59 @@ class App extends React.Component {
         console.log(error)
         this.setState({ 'todos': [] })
       })
-    }
+  }
 
-    logOut() {
-      localStorage.setItem('token', '')
-      this.setState({
-          'token': '',
-      }, this.getData)
-    }
+  logOut() {
+    localStorage.setItem('token', '')
+    this.setState({
+      'token': '',
+    }, this.getData)
+  }
 
-    render()
-    {
-      return (
-        <div className="App">
-          <BrowserRouter>
-            <nav>
-              <ul>
-                <li>
-                  <Link to='/'>Users</Link>
-                </li>
-                <li>
-                  <Link to='/project'>Project</Link>
-                </li>
-                <li>
-                  <Link to='/todo'>Todo</Link>
-                </li>
-                <li>
-                  {this.isAuth() ? <button onClick={() => this.logOut()}>Logout</button> : <Link to='/login'>Login</Link>}
-                </li>
-              </ul>
-            </nav>
-            <Routes>
-              <Route exact path='/' element={<UserList users={this.state.users} />} />
-              <Route exact path='/project' element={<ProjectList projects={this.state.projects} />} />
-              <Route exact path='/todo' element={<TodoList todos={this.state.todos} />} />
-              <Route exact path='/login' element={<LoginForm obtainAuthToken={(login, password) => this.obtainAuthToken(login, password)} />} />
-              <Route path='*' element={<NotFound404 />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
-      )
-    }
-  
+  deleteNote(id) {
+    let headers = this.getHeaders()
+    axios
+      .delete(`http://127.0.0.1:8000/api/todo/${id}`, { headers })
+      .then(response => {
+        this.setState({
+          'todos': this.state.todos.filter((todo) => todo.id != id)
+        })
+      })
+      .catch(error => console.log(error))
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <BrowserRouter>
+          <nav>
+            <ul>
+              <li>
+                <Link to='/'>Users</Link>
+              </li>
+              <li>
+                <Link to='/project'>Project</Link>
+              </li>
+              <li>
+                <Link to='/todo'>Todo</Link>
+              </li>
+              <li>
+                {this.isAuth() ? <button onClick={() => this.logOut()}>Logout</button> : <Link to='/login'>Login</Link>}
+              </li>
+            </ul>
+          </nav>
+          <Routes>
+            <Route exact path='/' element={<UserList users={this.state.users} />} />
+            <Route exact path='/project' element={<ProjectList projects={this.state.projects} />} />
+            <Route exact path='/todo' element={<TodoList todos={this.state.todos} deleteNote={(id) => this.deleteNote(id)} />} />
+            <Route exact path='/login' element={<LoginForm obtainAuthToken={(login, password) => this.obtainAuthToken(login, password)} />} />
+            <Route path='*' element={<NotFound404 />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    )
+  }
+
 }
 
 export default App;
