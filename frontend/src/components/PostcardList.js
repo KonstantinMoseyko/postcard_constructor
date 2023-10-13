@@ -1,50 +1,50 @@
 import React from 'react'
 
 
-const UserItem = ({ user }) => {
+const PostcardItem = ({ postcard }) => {
     return (
         <tr>
             <td>
-                {user.username}
+                {postcard.creator}
             </td>
             <td>
-                {user.first_name}
+                {postcard.title}
             </td>
             <td>
-                {user.last_name}
+                {postcard.description}
             </td>
             <td>
-                {user.email}
+                <img src={postcard.image_url} alt={postcard.title} style={{ maxWidth: "250px" }} />
             </td>
         </tr >
     )
 }
 
-const UserList = ({ users }) => {
+const PostcardList = ({ postcards }) => {
     return (
         <table width = "50%" border = "2">
             <thead>
                 <tr>
                     <th>
-                        Username
+                        Автор
                     </th>
                     <th>
-                        First name
+                        Название
                     </th>
                     <th>
-                        Last Name
+                        Описание
                     </th>
                     <th>
-                        Email
+                        Изображение
                     </th>
                 </tr>
             </thead>
             <tbody>
-                {users.map((user) => <UserItem user={user} />)}
+                {postcards.map((postcard) => <PostcardItem postcard={postcard} />)}
             </tbody>
         </table>
     )
 }
 
 
-export default UserList
+export default PostcardList

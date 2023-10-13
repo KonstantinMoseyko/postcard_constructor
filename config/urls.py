@@ -15,14 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
+from django.conf import settings
+from django.conf.urls.static import static
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from graphene_django.views import GraphQLView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from todoapp.views import ProjectModelViewSet, TodoModelViewSet
-from users.views import UserModelLimitedViewSet
+from todoapp.views import PostcardViewSet
+from users.views import UserModelViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -35,11 +37,8 @@ schema_view = get_schema_view(
 )
 
 router = DefaultRouter()
-# router.register("users", UserModelViewSet)
-router.register("users", UserModelLimitedViewSet)
-router.register("project", ProjectModelViewSet)
-router.register("todo", TodoModelViewSet)
-
+router.register("users", UserModelViewSet)
+router.register("postcards", PostcardViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -49,4 +48,4 @@ urlpatterns = [
     path("swagger", schema_view.with_ui()),
     re_path(r"swagger(?P<format>\.json|\.yaml)", schema_view.without_ui()),
     path("graphql/", GraphQLView.as_view(graphiql=True)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,13 +1,11 @@
 import React from 'react';
 import './App.css';
 import UserList from './components/User.js'
-import ProjectList from './components/Project.js'
-import TodoList from './components/Todo.js'
+import PostcardList from './components/PostcardList.js'
+import ImageUploadForm from './components/PostcardForm.js'
 import LoginForm from './components/LoginForm.js'
 import axios from 'axios'
 import { Route, BrowserRouter, Routes, Link, useLocation } from 'react-router-dom'
-import ProjectForm from './components/ProjectForm';
-import NoteForm from './components/NoteForm';
 
 const NotFound404 = () => {
   var { pathname } = useLocation()
@@ -24,12 +22,28 @@ class App extends React.Component {
     super(props)
     this.state = {
       'users': [],
-      'projects': [],
-      'todos': [],
+      'postcards': [],
       'token': ''
     }
   }
 
+  uploadImage(formdata) {
+    let headers = this.getHeaders()
+    // assuming getHeaders method returns appropriate headers, including 'Content-Type': 'multipart/form-data' if necessary
+
+    axios
+      .post('http://127.0.0.1:8000/api/postcards/', formdata, { headers })
+      .then(_response => {
+        this.setState({
+          'redirect': '/postcards'
+          // Update state if needed
+        }, this.getData)   // assuming getData fetches latest data from server
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+  
   obtainAuthToken(login, password) {
     axios
       .post('http://127.0.0.1:8000/api-token-auth/', {
@@ -61,7 +75,8 @@ class App extends React.Component {
   getHeaders() {
     if (this.isAuth()) {
       return {
-        'Authorization': 'Token ' + this.state.token
+        'Authorization': 'Token ' + this.state.token,
+        'Content-Type': 'multipart/form-data'
       }
     }
     return {}
@@ -83,30 +98,17 @@ class App extends React.Component {
         this.setState({ 'users': [] })
       })
 
-    axios.get('http://127.0.0.1:8000/api/project/', { headers })
+    axios.get('http://127.0.0.1:8000/api/postcards/', { headers })
       .then(response => {
-        const projects = response.data
+        const postcards = response.data
         this.setState(
           {
-            'projects': projects
+            'postcards': postcards
           })
       })
       .catch(error => {
         console.log(error)
-        this.setState({ 'projects': [] })
-      })
-
-    axios.get('http://127.0.0.1:8000/api/todo/', { headers })
-      .then(response => {
-        const todos = response.data
-        this.setState(
-          {
-            'todos': todos
-          })
-      })
-      .catch(error => {
-        console.log(error)
-        this.setState({ 'todos': [] })
+        this.setState({ 'postcards': [] })
       })
   }
 
@@ -117,18 +119,6 @@ class App extends React.Component {
     }, this.getData)
   }
 
-  deleteNote(id) {
-    let headers = this.getHeaders()
-    axios
-      .delete(`http://127.0.0.1:8000/api/todo/${id}`, { headers })
-      .then(response => {
-        this.setState({
-          'todos': this.state.todos.filter((todo) => todo.id != id)
-        })
-      })
-      .catch(error => console.log(error))
-  }
-
   render() {
     return (
       <div className="App">
@@ -136,13 +126,13 @@ class App extends React.Component {
           <nav>
             <ul>
               <li>
-                <Link to='/'>Users</Link>
+                <Link to='/'>Пользователи</Link>
               </li>
               <li>
-                <Link to='/project'>Project</Link>
+                <Link to='/postcard'>Открытки</Link>
               </li>
               <li>
-                <Link to='/todo'>Todo</Link>
+                <Link to='/postcard_uploading'>Загрузка открыток</Link>
               </li>
               <li>
                 {this.isAuth() ? <button onClick={() => this.logOut()}>Logout</button> : <Link to='/login'>Login</Link>}
@@ -151,8 +141,8 @@ class App extends React.Component {
           </nav>
           <Routes>
             <Route exact path='/' element={<UserList users={this.state.users} />} />
-            <Route exact path='/project' element={<ProjectList projects={this.state.projects} />} />
-            <Route exact path='/todo' element={<TodoList todos={this.state.todos} deleteNote={(id) => this.deleteNote(id)} />} />
+            <Route exact path='/postcard' element={<PostcardList postcards={this.state.postcards} />} />
+            <Route exact path='/postcard_uploading' element={<ImageUploadForm uploadImage={(formdata) => this.uploadImage(formdata)}/>} />
             <Route exact path='/login' element={<LoginForm obtainAuthToken={(login, password) => this.obtainAuthToken(login, password)} />} />
             <Route path='*' element={<NotFound404 />} />
           </Routes>

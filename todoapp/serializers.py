@@ -1,15 +1,14 @@
 from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
+from .models import Postcard
 
-from .models import Project, Todo
 
+class PostcardSerializer(ModelSerializer):
 
-class ProjectModelSerializer(ModelSerializer):
+    creator = serializers.ReadOnlyField(source='creator.username')
+    creator_id = serializers.ReadOnlyField(source='creator.id')
+    image_url = serializers.ImageField(required=False)
+
     class Meta:
-        model = Project
-        fields = "__all__"
-
-
-class TodoModelSerializer(ModelSerializer):
-    class Meta:
-        model = Todo
-        fields = "__all__"
+        model = Postcard
+        fields = ['id', 'creator', 'creator_id', 'title', 'description', 'image_url']
